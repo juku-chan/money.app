@@ -1,0 +1,355 @@
+
+
+コードを貼り付けます。
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>出入金計算アプリ</title>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>出入金計算アプリ</title>
+
+<!-- ホーム画面用 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="出入金">
+
+<!-- アイコン -->
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+
+<style>
+
+
+
+
+
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 24px 16px 60px;
+    font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+    background: linear-gradient(160deg, #F3EEFA 0%, #FDEFF4 45%, #EAF8F1 100%);
+    min-height: 100vh;
+    color: #4A4358;
+  }
+
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: #6B5D8C;
+    margin: 8px 0 28px;
+    letter-spacing: 0.05em;
+  }
+
+  .card {
+    background: #FFFFFF;
+    border-radius: 24px;
+    padding: 20px 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 18px rgba(150, 130, 180, 0.12);
+  }
+
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed #EEE6F5;
+  }
+
+  .card-title .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .card.expense .card-title { color: #C48FA8; }
+  .card.expense .dot { background: #F3C6D8; }
+
+  .card.income .card-title { color: #6FB89C; }
+  .card.income .dot { background: #B7E6D3; }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .row:last-child {
+    margin-bottom: 0;
+  }
+
+  .row label {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #6B5D78;
+    flex: 1;
+  }
+
+  .input-wrap {
+    display: flex;
+    align-items: center;
+    background: #FAF7FC;
+    border: 2px solid #EDE3F5;
+    border-radius: 16px;
+    padding: 6px 12px;
+    transition: border-color 0.2s, background 0.2s;
+    width: 150px;
+  }
+
+  .card.expense .input-wrap { background: #FDF6F9; border-color: #F6DDE7; }
+  .card.income .input-wrap { background: #F5FBF8; border-color: #D9F0E6; }
+
+  .input-wrap:focus-within {
+    border-color: #C9A9E0;
+  }
+
+  .card.expense .input-wrap:focus-within { border-color: #E8A9C4; }
+  .card.income .input-wrap:focus-within { border-color: #8FCDB2; }
+
+  .input-wrap span.yen {
+    font-size: 13px;
+    color: #A99BB8;
+    margin-right: 4px;
+  }
+
+  input[type="number"] {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    text-align: right;
+    font-size: 16px;
+    font-weight: 600;
+    color: #4A4358;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input::placeholder {
+    color: #D8CEE2;
+    font-weight: 400;
+  }
+
+  .subtotal {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 2px dashed #EEE6F5;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .card.expense .subtotal { color: #D68FAE; }
+  .card.income .subtotal { color: #5FAE8E; }
+
+  .result-card {
+    background: linear-gradient(135deg, #E9DFF7 0%, #FBE3EC 55%, #DFF3EA 100%);
+    border-radius: 26px;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(160, 140, 190, 0.2);
+  }
+
+  .result-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #7A6B8C;
+    margin-bottom: 6px;
+    letter-spacing: 0.1em;
+  }
+
+  .result-amount {
+    font-size: 34px;
+    font-weight: 800;
+    color: #5A4C72;
+    transition: color 0.2s;
+  }
+
+  .result-amount.negative {
+    color: #D06E93;
+  }
+
+  .result-amount.positive {
+    color: #4FA083;
+  }
+
+  .reset-btn {
+    display: block;
+    margin: 24px auto 0;
+    background: #FFFFFF;
+    border: 2px solid #E4D6F0;
+    color: #8B7CA0;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 28px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 10px rgba(160, 140, 190, 0.12);
+  }
+
+  .reset-btn:hover {
+    background: #FAF5FE;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(160, 140, 190, 0.18);
+  }
+
+  .reset-btn:active {
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>出入金計算アプリ</h1>
+
+    <div class="card expense">
+      <div class="card-title"><span class="dot"></span>出金</div>
+      <div class="row">
+        <label for="smbc">SMBC 26日</label>
+        <div class="input-wrap"><span class="yen">¥</span><input type="number" id="smbc" placeholder="0" inputmode="numeric"></div>
+      </div>
+      <div class="row">
+        <label for="aplus">Aplus 27日</label>
+        <div class="input-wrap"><span class="yen">¥</span><input type="number" id="aplus" placeholder="0" inputmode="numeric"></div>
+      </div>
+      <div class="row">
+        <label for="paypay">PayPay 27日</label>
+        <div class="input-wrap"><span class="yen">¥</span><input type="number" id="paypay" placeholder="0" inputmode="numeric"></div>
+      </div>
+      <div class="row">
+        <label for="epos">EPOS 4日</label>
+        <div class="input-wrap"><span class="yen">¥</span><input type="number" id="epos" placeholder="0" inputmode="numeric"></div>
+      </div>
+      <div class="subtotal">
+        <span>出金合計</span>
+        <span id="expenseTotal">¥0</span>
+      </div>
+    </div>
+
+    <div class="card income">
+      <div class="card-title"><span class="dot"></span>入金</div>
+      <div class="row">
+        <label for="kouhi">公費</label>
+        <div class="input-wrap"><span class="yen">¥</span><input type="number" id="kouhi" placeholder="0" inputmode="numeric"></div>
+      </div>
+      <div class="row">
+        <label for="kyuyo">給与</label>
+        <div class="input-wrap"><span class="yen">¥</span><input type="number" id="kyuyo" placeholder="0" inputmode="numeric"></div>
+      </div>
+      <div class="row">
+        <label for="zandaka">残高</label>
+        <div class="input-wrap"><span class="yen">¥</span><input type="number" id="zandaka" placeholder="0" inputmode="numeric"></div>
+      </div>
+      <div class="subtotal">
+        <span>入金合計</span>
+        <span id="incomeTotal">¥0</span>
+      </div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-label">収支合計</div>
+      <div class="result-amount" id="finalTotal">¥0</div>
+    </div>
+
+    <button class="reset-btn" id="resetBtn">リセット</button>
+  </div>
+
+<script>
+  const expenseIds = ['smbc', 'aplus', 'paypay', 'epos'];
+  const incomeIds = ['kouhi', 'kyuyo', 'zandaka'];
+  const allIds = [...expenseIds, ...incomeIds];
+
+  function getVal(id) {
+    const v = parseFloat(document.getElementById(id).value);
+    return isNaN(v) ? 0 : v;
+  }
+
+  function formatYen(n) {
+    return '¥' + n.toLocaleString('ja-JP');
+  }
+
+  function calculate() {
+    const expenseTotal = expenseIds.reduce((sum, id) => sum + getVal(id), 0);
+    const incomeTotal = incomeIds.reduce((sum, id) => sum + getVal(id), 0);
+    const final = incomeTotal - expenseTotal;
+
+    document.getElementById('expenseTotal').textContent = formatYen(expenseTotal);
+    document.getElementById('incomeTotal').textContent = formatYen(incomeTotal);
+
+    const finalEl = document.getElementById('finalTotal');
+    finalEl.textContent = (final < 0 ? '-¥' + Math.abs(final).toLocaleString('ja-JP') : formatYen(final));
+    finalEl.classList.remove('negative', 'positive');
+    if (final < 0) finalEl.classList.add('negative');
+    else if (final > 0) finalEl.classList.add('positive');
+  }
+
+  const STORAGE_KEY = 'shutsunyukin_data';
+
+  function save() {
+    const data = {};
+    allIds.forEach(id => data[id] = document.getElementById(id).value);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function load() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      allIds.forEach(id => {
+        if (data[id] !== undefined) document.getElementById(id).value = data[id];
+      });
+    } catch (e) {
+      // 保存データが壊れている場合は無視する
+    }
+  }
+
+  allIds.forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      calculate();
+      save();
+    });
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    allIds.forEach(id => document.getElementById(id).value = '');
+    calculate();
+    save();
+  });
+
+  load();
+  calculate();
+</script>
+</body>
+</html>
